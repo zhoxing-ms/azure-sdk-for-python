@@ -16,8 +16,6 @@ steps:
       arguments: >
         -PackageName ${{ parameters.PackageName }}
         -ServiceName ${{ parameters.ServiceName }}
-        -RepoRoot $(Build.SourcesDirectory)
-        -RepoName $(Build.Repository.Name)
         -ForRelease $${{ parameters.ForRelease }}
       pwsh: true
       workingDirectory: $(Pipeline.Workspace)

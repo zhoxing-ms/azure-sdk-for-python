@@ -1,5 +1,4 @@
 # Helper functions for retireving useful information from azure-sdk-for-* repo
-# Example Use : Import-Module .\eng\common\scripts\modules
 class PackageProps
 {
     [string]$pkgName
@@ -10,12 +9,12 @@ class PackageProps
     [string]$pkgChangeLogPath
     [string]$pkgGroup
 
-    PackageProps([string]$pkgName,[string]$pkgVersion,[string]$pkgDirectoryPath,[string]$pkgServiceName)
+    PackageProps([string]$pkgName, [string]$pkgVersion, [string]$pkgDirectoryPath, [string]$pkgServiceName)
     {
         $this.Initialize($pkgName, $pkgVersion, $pkgDirectoryPath, $pkgServiceName)
     }
 
-    PackageProps([string]$pkgName,[string]$pkgVersion,[string]$pkgDirectoryPath,[string]$pkgServiceName,[string]$pkgGroup="")
+    PackageProps([string]$pkgName, [string]$pkgVersion, [string]$pkgDirectoryPath, [string]$pkgServiceName, [string]$pkgGroup = "")
     {
         $this.Initialize($pkgName, $pkgVersion, $pkgDirectoryPath, $pkgServiceName, $pkgGroup)
     }
@@ -72,9 +71,9 @@ function Get-PkgProperties
 {
     Param
     (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$PackageName,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$ServiceName
     )
 
@@ -92,13 +91,13 @@ function Get-PkgProperties
     foreach ($directory in $directoriesPresent)
     {
         $pkgDirectoryPath = Join-Path $serviceDirectoryPath $directory.Name
-        if ($ExtractPkgProps)
+        if ($GetPackageInfoFromRepoFn)
         {
-            $pkgProps = &$ExtractPkgProps -pkgPath $pkgDirectoryPath -serviceName $ServiceName -pkgName $PackageName
+            $pkgProps = &$GetPackageInfoFromRepoFn -pkgPath $pkgDirectoryPath -serviceName $ServiceName -pkgName $PackageName
         }
         else
         {
-            Write-Error "The function '${ExtractPkgProps}' was not found."
+            Write-Error "The function '${GetPackageInfoFromRepoFn}' was not found."
         }
 
         if ($pkgProps -ne $null)
@@ -112,7 +111,7 @@ function Get-PkgProperties
 # Takes ServiceName and Repo Root Directory
 # Returns important properties for each package in the specified service, or entire repo if the serviceName is not specified
 # Returns an Table of service key to array values of PS Object with properties @ { pkgName, pkgVersion, pkgDirectoryPath, pkgReadMePath, pkgChangeLogPath }
-function Get-AllPkgProperties ([string]$ServiceName=$null)
+function Get-AllPkgProperties ([string]$ServiceName = $null)
 {
     $pkgPropsResult = @()
 
@@ -153,7 +152,7 @@ function Operate-OnPackages ($activePkgList, $serviceName, [Array]$pkgPropsResul
 {
     foreach ($pkg in $activePkgList)
     {
-        $pkgProps = Get-PkgProperties -PackageName $pkg["name"] -ServiceName $serviceName
+        $pkgProps = Get-PkgProperties -PackageName $pkg["name"]-ServiceName $serviceName
         $pkgPropsResult += $pkgProps
     }
     return $pkgPropsResult
@@ -168,11 +167,11 @@ function Get-PkgListFromYml ($ciYmlPath)
     $ciYmlObj = ConvertFrom-Yaml $ciYmlContent -Ordered
     if ($ciYmlObj.Contains("stages"))
     {
-      $artifactsInCI = $ciYmlObj["stages"][0]["parameters"]["Artifacts"]
+        $artifactsInCI = $ciYmlObj["stages"][0]["parameters"]["Artifacts"]
     }
     elseif ($ciYmlObj.Contains("extends")) 
     {
-      $artifactsInCI = $ciYmlObj["extends"]["parameters"]["Artifacts"]
+        $artifactsInCI = $ciYmlObj["extends"]["parameters"]["Artifacts"]
     }
     if ($artifactsInCI -eq $null)
     {
